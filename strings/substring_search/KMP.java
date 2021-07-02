@@ -1,0 +1,159 @@
+/******************************************************************************
+ *  Compilation:  javac KMP.java
+ *  Execution:    java KMP pattern text
+ *
+ *  Reads in two strings, the pattern and the input text, and
+ *  searches for the pattern in the input text using the
+ *  KMP algorithm.
+ *
+ *  % java KMP abracadabra abacadabrabracabracadabrabrabracad
+ *  text:    abacadabrabracabracadabrabrabracad
+ *  pattern:               abracadabra
+ *
+ *  % java KMP rab abacadabrabracabracadabrabrabracad
+ *  text:    abacadabrabracabracadabrabrabracad
+ *  pattern:         rab
+ *
+ *  % java KMP bcara abacadabrabracabracadabrabrabracad
+ *  text:    abacadabrabracabracadabrabrabracad
+ *  pattern:                                   bcara
+ *
+ *  % java KMP rabrabracad abacadabrabracabracadabrabrabracad
+ *  text:    abacadabrabracabracadabrabrabracad
+ *  pattern:                        rabrabracad
+ *
+ *  % java KMP abacad abacadabrabracabracadabrabrabracad
+ *  text:    abacadabrabracabracadabrabrabracad
+ *  pattern: abacad
+ *
+ ******************************************************************************/
+
+/**
+ *  The KMP class finds the first occurrence of a pattern string
+ *  in a text string.
+ *  This implementation uses a version of the Knuth-Morris-Pratt substring search
+ *  algorithm. The version takes time proportional to n + m * R in the worst case,
+ *  where n is the length of the text string, m is the length of the pattern,
+ *  and R is the alphabet size.
+ *  It uses extra space proportional to m * R.
+ */
+public class KMP {
+    private final int R; // the radix
+    private final int m; // length of pattern
+    private int[][] dfa; // the KMP deterministic finite state automaton
+
+    /**
+     * Preprocess the pattern string.
+     *
+     * @param pat the pattern string.
+     */
+    public KMP(String pat) {
+        this.R = 256;
+        this.m = pat.length();
+
+        // build DFA from pattern.
+        dfa = new int[R][m];
+        dfa[pat.charAt(0)][0] = 1;
+        for (int x = 0, j = 1; j < m; j++) {
+            for (int c = 0; c < R; c++) {
+                dfa[c][j] = dfa[c][x]; // Copy mismatch cases.
+            }
+            dfa[pat.charAt(j)][j] = j + 1; // Set match case.
+            x = dfa[pat.charAt(j)][x]; // Update restart state.
+        }
+    }
+
+    /**
+     * Preprocesses the pattern string.
+     * @param pattern the pattern string.
+     * @param R the alphabet size.
+     */
+    public KMP(char[] pattern, int R) {
+        this.R = R;
+        this.m = pattern.length;
+
+        // build DFA from pattern
+        dfa = new int[R][m];
+        dfa[pattern[0]][0] = 1;
+        for (int x = 0, j = 1; j < m; j++) {
+            for (int c = 0; c < R; c++) {
+                dfa[c][j] = dfa[c][x]; // Copy mismatch cases.
+            }
+            dfa[pattern[j]][j] = j + 1; // Set match case.
+            x = dfa[pattern[j]][x]; // Update restart state.
+        }
+    }
+
+    /**
+     * Returns the index of the first occurrence of the pattern string in the text string.
+     *
+     * @param txt the text string
+     * @return the index of the first occurrence of the pattern string in the text string;
+     *         N if no such match.
+     */
+    public int search(String txt) {
+        // simulate operation of DFA on text
+        int n = txt.length();
+        int i, j;
+        for (i = 0, j = 0; i < n && j < m; i++) {
+            j = dfa[txt.charAt(i)][j];
+        }
+        if (j == m) {
+            return i - m; // found
+        }
+        return n; // not found
+    }
+
+    /**
+     * Returns the index of the first occurrence of the pattern string in the text string.
+     *
+     * @param text the text string
+     * @return the index of the first occurrence of the pattern string in the text string;
+     *         N if no such match.
+     */
+    public int search(char[] text) {
+        // simulate operation of DFA on text
+        int n = text.length;
+        int i, j;
+        for (i = 0, j = 0; i < n && j < m; i++) {
+            j = dfa[text[i]][j];
+        }
+        if (j == m) {
+            return i - m; // found
+        }
+        return n; // not found
+    }
+
+    /**
+     * Takes a pattern string and an input string as command-line arguments;
+     * searches for the pattern string in the text string; and prints
+     * the first occurrence of the pattern string in the text string.
+     *
+     * @param argv the command-line arguments
+     */
+    public static void main(String[] argv) {
+        String pat = argv[0];
+        String txt = argv[1];
+        char[] pattern = pat.toCharArray();
+        char[] text = txt.toCharArray();
+
+        KMP kmp1 = new KMP(pat);
+        int offset1 = kmp1.search(txt);
+
+        KMP kmp2 = new KMP(pattern, 256);
+        int offset2 = kmp2.search(text);
+
+        // print results
+        System.out.println("text:    " + txt);
+
+        System.out.print("pattern: ");
+        for (int i = 0; i < offset1; i++)
+            System.out.print(" ");
+        System.out.println(pat);
+
+        System.out.print("pattern: ");
+        for (int i = 0; i < offset2; i++)
+            System.out.print(" ");
+        System.out.println(pat);
+    }
+}
