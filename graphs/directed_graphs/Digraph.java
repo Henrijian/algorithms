@@ -1,8 +1,36 @@
+/******************************************************************************
+ *  Compilation:  javac Digraph.java
+ *  Execution:    java Digraph filename.txt
+ *  Dependencies: In.java
+ *
+ *  A graph, implemented using an array of lists.
+ *  Parallel edges and self-loops are permitted.
+ *
+ *  % java Digraph tinyDG.txt
+ *  13 vertices, 22 edges
+ *  0: 5 1
+ *  1:
+ *  2: 0 3
+ *  3: 5 2
+ *  4: 3 2
+ *  5: 4
+ *  6: 9 4 8 0
+ *  7: 6 9
+ *  8: 6
+ *  9: 11 10
+ *  10: 12
+ *  11: 4 12
+ *  12: 9
+ *
+ ******************************************************************************/
 package graphs.directed_graphs;
 
-import java.util.HashSet;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 /**
  *  The Digraph class represents a directed graph of vertices
@@ -51,6 +79,36 @@ public class Digraph {
             this.adj[v] = new LinkedList<>();
         }
         this.indegree = new int[V];
+    }
+
+    public Digraph(InputStream in) {
+        if (in == null) {
+            throw new IllegalArgumentException("argument is null");
+        }
+        try {
+            Scanner sc = new Scanner(in);
+            this.V = sc.nextInt();
+            if (V < 0)  {
+                throw new IllegalArgumentException("number of vertices in a Digraph must be non-negative");
+            }
+            int E = sc.nextInt();
+            if (E < 0) {
+                throw new IllegalArgumentException("number of edges in a Digraph must be non-negative");
+            }
+            this.adj = new LinkedList[V];
+            for (int v = 0; v < V; v++) {
+                adj[v] = new LinkedList<Integer>();
+            }
+            indegree = new int[V];
+            for (int i = 0; i < E; i++) {
+                int v = sc.nextInt();
+                int w = sc.nextInt();
+                addEdge(v, w);
+            }
+        }
+        catch (NoSuchElementException e) {
+            throw new IllegalArgumentException("invalid input format in Digraph constructor", e);
+        }
     }
 
     /**
@@ -163,5 +221,16 @@ public class Digraph {
             s.append(NEWLINE);
         }
         return s.toString();
+    }
+
+    /**
+     * Unit tests the Digraph data type.
+     *
+     * @param argv the command-line arguments
+     */
+    public static void main(String[] argv) throws FileNotFoundException {
+        FileInputStream in = new FileInputStream(argv[0]);
+        Digraph G = new Digraph(in);
+        System.out.println(G);
     }
 }
