@@ -1,7 +1,6 @@
 /******************************************************************************
  *  Compilation:  javac Digraph.java
  *  Execution:    java Digraph filename.txt
- *  Dependencies: In.java
  *
  *  A graph, implemented using an array of lists.
  *  Parallel edges and self-loops are permitted.
