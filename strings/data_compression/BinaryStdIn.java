@@ -84,6 +84,9 @@ public final class BinaryStdIn {
         if (!initialized) {
             initialize();
         }
+        if (n == 0) {
+            fillBuffer();
+        }
         return buffer == EOF;
     }
 
@@ -301,10 +304,10 @@ public final class BinaryStdIn {
      */
     public static void main(String[] argv) {
         // read one 8-bit char at a time
-//        while (!BinaryStdIn.isEmpty()) {
-//            char c = BinaryStdIn.readChar();
-//            BinaryStdOut.write(c);
-//        }
-//        BinaryStdOut.flush();
+        while (!BinaryStdIn.isEmpty()) {
+            char c = BinaryStdIn.readChar();
+            BinaryStdOut.write(c);
+        }
+        BinaryStdOut.flush();
     }
 }
