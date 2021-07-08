@@ -186,7 +186,7 @@ public class BinaryStdOut {
             throw new IllegalArgumentException(String.format("Illegal %d-bit char = %d", r, x));
         }
         for (int i = 0; i < r; i++) {
-            boolean bit = ((x >>> (r - i - 1)) & 1) == 1;
+            boolean bit = ((x >> (r - i - 1)) & 1) == 1;
             write(bit);
         }
     }
