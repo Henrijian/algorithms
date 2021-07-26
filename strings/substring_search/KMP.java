@@ -27,6 +27,7 @@
  *  pattern: abacad
  *
  ******************************************************************************/
+package strings.substring_search;
 
 /**
  *  The KMP class finds the first occurrence of a pattern string
